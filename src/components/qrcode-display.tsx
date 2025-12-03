@@ -21,7 +21,7 @@ export default function QRCodeDisplay({ url }: QRCodeDisplayProps) {
                 width: 256,
                 margin: 2,
                 color: {
-                    dark: '#000000',
+                    dark: '#0a192f', // A dark navy blue
                     light: '#FFFFFF'
                 }
             }, (error) => {
@@ -34,37 +34,37 @@ export default function QRCodeDisplay({ url }: QRCodeDisplayProps) {
         try {
             await navigator.clipboard.writeText(url);
             toast({
-                title: "Copied to clipboard!",
-                description: "The connection URL has been copied.",
+                title: "Copié dans le presse-papiers !",
+                description: "L'URL de connexion a été copiée.",
             });
         } catch (err) {
             toast({
                 variant: 'destructive',
-                title: "Failed to copy",
-                description: "Could not copy URL to clipboard.",
+                title: "La copie a échoué",
+                description: "Impossible de copier l'URL dans le presse-papiers.",
             });
         }
     };
 
     return (
-        <Card className="bg-transparent border-0 shadow-none">
-            <CardHeader className="text-center md:text-left">
-                <CardTitle className="text-2xl font-bold flex items-center gap-2 justify-center md:justify-start">
+        <Card className="bg-transparent border-none shadow-none">
+            <CardHeader className="text-center">
+                <CardTitle className="text-xl font-bold flex items-center gap-2 justify-center">
                     <QrCode className="text-primary"/>
-                    Connect Your Mobile
+                    Connectez votre mobile
                 </CardTitle>
-                <CardDescription>
-                    Scan this QR code with your phone's camera. Both devices must be on the same Wi-Fi network.
+                <CardDescription className="text-sm">
+                    Scannez ce code QR avec l'appareil photo de votre téléphone.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center gap-6">
-                <div className="p-4 bg-white rounded-lg shadow-md transition-transform hover:scale-105">
-                    <canvas ref={canvasRef} className="rounded"/>
+            <CardContent className="flex flex-col items-center gap-4">
+                <div className="p-3 bg-white rounded-lg shadow-md transition-transform hover:scale-105 duration-300">
+                    <canvas ref={canvasRef} className="rounded-sm"/>
                 </div>
                 <div className="w-full text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Or enter this URL in your mobile browser:</p>
+                    <p className="text-xs text-muted-foreground mb-2">Ou entrez cette URL dans votre navigateur mobile :</p>
                     <div className="flex w-full items-center space-x-2">
-                        <Input type="text" value={url} readOnly className="bg-background/70 text-center" />
+                        <Input type="text" value={url} readOnly className="bg-secondary text-center text-sm" />
                         <Button variant="outline" size="icon" onClick={copyToClipboard} aria-label="Copy URL">
                             <Copy className="h-4 w-4" />
                         </Button>

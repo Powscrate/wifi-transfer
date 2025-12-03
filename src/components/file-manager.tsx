@@ -9,6 +9,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { UploadCloud, FileText, Download, Trash2, Loader2, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 type FileInfo = {
   name: string;
@@ -69,16 +81,16 @@ export default function FileManager() {
 
       xhr.onload = () => {
         if (xhr.status === 200) {
-          toast({ title: 'Upload successful', description: `File '${file.name}' has been uploaded.` });
+          toast({ title: 'Téléchargement réussi', description: `Fichier '${file.name}' a été téléversé.` });
           fetchFiles();
         } else {
-          toast({ variant: 'destructive', title: 'Upload failed', description: `Could not upload '${file.name}'.` });
+          toast({ variant: 'destructive', title: 'Échec du téléversement', description: `Impossible de téléverser '${file.name}'.` });
         }
         setUploadingFiles(prev => prev.filter(f => f.name !== file.name));
       };
       
       xhr.onerror = () => {
-        toast({ variant: 'destructive', title: 'Upload failed', description: 'An error occurred during upload.' });
+        toast({ variant: 'destructive', title: 'Échec du téléversement', description: 'Une erreur est survenue lors du téléversement.' });
         setUploadingFiles(prev => prev.filter(f => f.name !== file.name));
       };
 
@@ -94,55 +106,54 @@ export default function FileManager() {
     try {
       const response = await fetch(`/api/files/${filename}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete');
-      toast({ title: 'File deleted', description: `'${filename}' was successfully deleted.` });
+      toast({ title: 'Fichier supprimé', description: `'${filename}' a été supprimé avec succès.` });
       fetchFiles();
     } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: `Could not delete '${filename}'.` });
+      toast({ variant: 'destructive', title: 'Erreur', description: `Impossible de supprimer '${filename}'.` });
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 h-full flex flex-col">
       <div {...getRootProps()}
         className={cn(
-          "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors duration-300",
+          "border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors duration-300 flex-shrink-0",
           isDragActive ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
         )}
       >
         <input {...getInputProps()} />
-        <div className="flex flex-col items-center gap-4">
-          <UploadCloud className={cn("w-12 h-12 text-muted-foreground", isDragActive && "text-primary animate-bounce")} />
-          <p className="text-muted-foreground">
-            {isDragActive ? "Drop files here to upload" : "Drag & drop files here"}
+        <div className="flex flex-col items-center gap-3">
+          <UploadCloud className={cn("w-10 h-10 text-muted-foreground", isDragActive && "text-primary animate-bounce")} />
+          <p className="text-muted-foreground text-sm">
+            {isDragActive ? "Lâchez les fichiers ici" : "Glissez-déposez des fichiers"}
           </p>
-          <Button onClick={open} variant="outline" className="gap-2">
-            <Send className="h-4 w-4" />
-            Or Select Files
+          <Button onClick={open} variant="outline" size="sm">
+            <Send className="h-4 w-4 mr-2" />
+            Ou sélectionnez
           </Button>
         </div>
       </div>
       
       {(uploadingFiles.length > 0) && (
-        <div className="space-y-2">
+        <div className="space-y-2 flex-shrink-0">
           {uploadingFiles.map(file => (
-            <div key={file.name} className="p-2 rounded-md bg-muted/50">
+            <div key={file.name} className="p-2 rounded-md bg-secondary">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-sm font-medium truncate">{file.name}</span>
-                <span className="text-xs text-muted-foreground">{file.progress}%</span>
+                <span className="text-xs text-secondary-foreground">{file.progress}%</span>
               </div>
               <Progress value={file.progress} className="h-2" />
             </div>
-          ))}
+))}
         </div>
       )}
 
-      <Card className="bg-transparent border-0 shadow-none">
-        <CardHeader>
-          <CardTitle>Shared Files</CardTitle>
-          <CardDescription>Files available for download on all connected devices.</CardDescription>
+      <Card className="bg-transparent border-none shadow-none flex-grow flex flex-col">
+        <CardHeader className="p-2">
+          <CardTitle className="text-lg">Fichiers Partagés</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-64 pr-4">
+        <CardContent className="p-0 flex-grow">
+          <ScrollArea className="h-64 pr-3">
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -150,32 +161,48 @@ export default function FileManager() {
             ) : files.length > 0 ? (
               <ul className="space-y-2">
                 {files.map(file => (
-                  <li key={file.name} className="flex items-center justify-between p-3 rounded-md bg-background/70 hover:bg-accent/10 transition-colors duration-200">
+                  <li key={file.name} className="flex items-center justify-between p-2 rounded-lg bg-secondary hover:bg-accent transition-colors duration-200">
                     <div className="flex items-center gap-3 overflow-hidden">
-                      <FileText className="h-6 w-6 text-primary flex-shrink-0" />
+                      <FileText className="h-5 w-5 text-primary flex-shrink-0" />
                       <div className="flex flex-col overflow-hidden">
                         <span className="text-sm font-medium truncate">{file.name}</span>
-                        <span className="text-xs text-muted-foreground">{formatBytes(file.size)}</span>
+                        <span className="text-xs text-secondary-foreground">{formatBytes(file.size)}</span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                    <div className="flex gap-1">
+                       <Button asChild variant="ghost" size="icon" className="h-8 w-8">
                         <a href={`/api/files/${file.name}`} download aria-label={`Download ${file.name}`}>
                           <Download className="h-4 w-4" />
                         </a>
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive/70 hover:text-destructive" onClick={() => handleDelete(file.name)} aria-label={`Delete ${file.name}`}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive/70 hover:text-destructive" aria-label={`Delete ${file.name}`}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Cette action est irréversible. Le fichier '{file.name}' sera définitivement supprimé.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(file.name)}>Supprimer</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground py-10">
+              <div className="flex flex-col items-center justify-center h-full text-center text-secondary-foreground py-10 rounded-lg bg-secondary">
                 <FileText className="h-10 w-10 mb-4" />
-                <p className="font-medium">No files shared yet</p>
-                <p className="text-sm">Upload a file to get started.</p>
+                <p className="font-medium">Aucun fichier partagé</p>
+                <p className="text-sm">Téléversez un fichier pour commencer.</p>
               </div>
             )}
           </ScrollArea>

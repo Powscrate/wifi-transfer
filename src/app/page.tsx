@@ -8,10 +8,8 @@ export default function Home() {
   const serverUrl = `http://${localIp}:${port}`;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-8">
-      <div className="z-10 w-full max-w-5xl">
-        <TransferHub serverUrl={serverUrl} />
-      </div>
+    <main className="flex min-h-screen w-full items-center justify-center p-4">
+      <TransferHub serverUrl={serverUrl} />
     </main>
   );
 }
