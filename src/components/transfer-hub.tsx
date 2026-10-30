@@ -45,7 +45,7 @@ export default function TransferHub({ serverUrl }: TransferHubProps) {
             <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
                 <Wifi className="w-8 h-8 md:w-10 md:h-10 text-primary" />
                 <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-center md:text-left">
-                    Wifi Transfer FILES
+                    Wifi Transfer FILES TRT
                 </h1>
             </div>
 
