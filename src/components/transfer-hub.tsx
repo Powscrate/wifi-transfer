@@ -1,82 +1,107 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Sparkles, ShieldCheck, Smartphone, Wifi, Zap } from 'lucide-react';
 import QRCodeDisplay from './qrcode-display';
 import FileManager from './file-manager';
-import { Wifi, Smartphone, Laptop } from 'lucide-react';
-import { Skeleton } from './ui/skeleton';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import ThemeToggle from './theme-toggle';
 
 type TransferHubProps = {
   serverUrl: string;
 };
 
 export default function TransferHub({ serverUrl }: TransferHubProps) {
-  const isMobile = useIsMobile();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const glassmorphismClass = "bg-card/60 backdrop-blur-sm";
-
-  if (!isClient) {
-    return (
-      <Card className="w-full max-w-5xl h-[70vh]">
-        <CardContent className="p-4 md:p-8">
-            <div className="flex items-center gap-4 mb-6">
-                <Wifi className="w-8 h-8 md:w-10 md:h-10 text-primary" />
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
-                    Wifi Transfer Hub
-                </h1>
-            </div>
-            <Skeleton className="w-full h-[55vh] rounded-lg" />
-        </CardContent>
-      </Card>
-    );
-  }
-  
   return (
-    <Card className={`w-full max-w-5xl shadow-2xl border-none ${glassmorphismClass}`}>
-        <CardContent className="p-4 md:p-6">
-            <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-                <Wifi className="w-8 h-8 md:w-10 md:h-10 text-primary" />
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-center md:text-left">
-                    Wifi Transfer FILES TRT
-                </h1>
+    <div className="flex flex-1 flex-col">
+      {/* Brand bar */}
+      <header className="animate-fade-up flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 opacity-60 blur-lg" />
+            <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 via-indigo-500 to-cyan-400 shadow-lg shadow-violet-500/25">
+              <Wifi className="h-5 w-5 text-white" strokeWidth={2.6} />
             </div>
+          </div>
+          <div className="leading-tight">
+            <p className="font-headline text-[17px] font-bold tracking-tight">WiFi Transfer</p>
+            <p className="text-xs text-muted-foreground">Partage local, instantané</p>
+          </div>
+        </div>
 
-            {isMobile ? (
-                <>
-                    <div className="flex items-center justify-center gap-2 text-lg text-secondary-foreground mb-6">
-                        <Smartphone className="h-6 w-6"/>
-                        <span>Mode Mobile</span>
-                    </div>
-                    <FileManager />
-                </>
-            ) : (
-                <div className="grid md:grid-cols-5 gap-6 xl:gap-8 items-start">
-                    <div className="md:col-span-2">
-                        <div className="flex items-center gap-2 text-lg text-secondary-foreground mb-4">
-                            <Laptop className="h-6 w-6"/>
-                            <span>Bureau</span>
-                        </div>
-                        <QRCodeDisplay url={serverUrl} />
-                    </div>
-                    <Separator orientation="vertical" className="hidden md:block h-auto mx-auto" />
-                    <div className="md:col-span-2">
-                         <div className="flex items-center gap-2 text-lg text-secondary-foreground mb-4">
-                            <Smartphone className="h-6 w-6"/>
-                            <span>Appareils Connectés</span>
-                        </div>
-                        <FileManager />
-                    </div>
-                </div>
-            )}
-        </CardContent>
-    </Card>
+        <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 rounded-full border border-border/70 bg-background/60 px-3 py-2 text-xs font-medium text-muted-foreground backdrop-blur sm:flex">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            En ligne sur le réseau local
+          </div>
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section
+        className="animate-fade-up mt-12 max-w-2xl sm:mt-16 lg:mt-20"
+        style={{ animationDelay: '60ms' }}
+      >
+        <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground backdrop-blur">
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
+          Peer-to-peer · Sans compte
+        </div>
+
+        <h1 className="mt-5 font-headline text-4xl font-extrabold leading-[1.02] tracking-[-0.035em] sm:text-5xl lg:text-6xl">
+          Vos fichiers,
+          <br />
+          <span className="text-gradient">sans le cloud.</span>
+        </h1>
+
+        <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Scannez le code, glissez vos fichiers et partagez-les instantanément entre vos appareils.
+          Tout reste sur votre Wi-Fi.
+        </p>
+
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          {[
+            { icon: ShieldCheck, label: '100% privé' },
+            { icon: Zap, label: 'Transfert instantané' },
+            { icon: Wifi, label: 'Aucun câble' },
+          ].map(({ icon: Icon, label }) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/50 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
+            >
+              <Icon className="h-3.5 w-3.5 text-primary" />
+              {label}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border/60 bg-background/50 px-3 py-2 text-xs text-muted-foreground backdrop-blur lg:hidden">
+          <Smartphone className="h-3.5 w-3.5 text-primary" />
+          Mode mobile : vos fichiers apparaîtront sur tous les appareils connectés.
+        </div>
+      </section>
+
+      {/* Connection + transfer panels */}
+      <div className="mt-10 grid flex-1 items-start gap-5 lg:mt-14 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:gap-6">
+        <div
+          className="animate-fade-up hidden lg:sticky lg:top-6 lg:block"
+          style={{ animationDelay: '120ms' }}
+        >
+          <QRCodeDisplay url={serverUrl} />
+        </div>
+
+        <div className="animate-fade-up" style={{ animationDelay: '180ms' }}>
+          <FileManager />
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row">
+        <p className="flex items-center gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+          Aucun fichier n&apos;est envoyé sur Internet.
+        </p>
+        <p className="font-mono text-[11px] tracking-tight text-muted-foreground/80">{serverUrl}</p>
+      </footer>
+    </div>
   );
 }

@@ -14,9 +14,10 @@ function safeJoin(base: string, ...parts: string[]): string | null {
   return null;
 }
 
-export async function GET(request: Request, { params }: { params: { filename: string[] } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ filename: string[] }> }) {
   try {
-    const filename = params.filename.join('/');
+    const { filename: segments } = await params;
+    const filename = segments.join('/');
     const filePath = safeJoin(UPLOADS_DIR, filename);
 
     if (!filePath) {
@@ -35,7 +36,7 @@ export async function GET(request: Request, { params }: { params: { filename: st
       },
     });
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
     console.error('Download error:', error);
@@ -43,9 +44,10 @@ export async function GET(request: Request, { params }: { params: { filename: st
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { filename: string[] } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ filename: string[] }> }) {
     try {
-        const filename = params.filename.join('/');
+        const { filename: segments } = await params;
+        const filename = segments.join('/');
         const filePath = safeJoin(UPLOADS_DIR, filename);
 
         if (!filePath) {
@@ -55,7 +57,7 @@ export async function DELETE(request: Request, { params }: { params: { filename:
         await fsp.unlink(filePath);
         return NextResponse.json({ success: true });
     } catch (error) {
-        if (error.code === 'ENOENT') {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
             return NextResponse.json({ error: 'File not found' }, { status: 404 });
         }
         console.error('Delete error:', error);

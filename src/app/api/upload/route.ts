@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Writable } from 'stream';
+import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
+import { createWriteStream } from 'fs';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -10,7 +11,7 @@ async function ensureUploadsDirExists() {
   try {
     await fs.access(UPLOADS_DIR);
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       await fs.mkdir(UPLOADS_DIR, { recursive: true });
     } else {
       throw error;
@@ -35,8 +36,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid file path.' }, { status: 400 });
     }
 
-    const fileStream = file.stream();
-    const writeStream = Writable.toWeb(fs.createWriteStream(filePath));
+    const fileStream = Readable.fromWeb(file.stream() as Parameters<typeof Readable.fromWeb>[0]);
+    const writeStream = createWriteStream(filePath);
     
     await pipeline(fileStream, writeStream);
 
